@@ -10,7 +10,7 @@ by Tomé Albuquerque, Ricardo Cruz, Jaime S. Cardoso
 
 ## Code organization
 
-  * **data/:** original and pre-processed data
+  * **data/:** avaiable at: http://mde-lab.aegean.gr/index.php/downloads
   * **train.py:** train the different models with the different ordinal losses
     and outputs probabilities.
   * **evaluate.py:** generate latex tables with results using the output
