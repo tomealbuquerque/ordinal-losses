@@ -1,4 +1,4 @@
-# A Non-Parametric Loss for Ordinal Classification of Cervical Cancer Risk
+# Ordinal Losses for Classification of Cervical Cancer Risk
 
 by Tomé Albuquerque, Ricardo Cruz, Jaime S. Cardoso
 
