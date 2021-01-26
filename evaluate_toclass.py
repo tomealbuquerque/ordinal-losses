@@ -1,6 +1,7 @@
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('K', type=int)
+parser.add_argument('baseline')
 parser.add_argument('outputs', nargs='+')
 parser.add_argument('--metrics', nargs='+', required=True)
 parser.add_argument('--architectures', nargs='+')
@@ -28,7 +29,8 @@ fields = {k: v for k, v in zip(fields[::2], fields[1::2])}
 print(r'''\documentclass{standalone}
 \begin{document}''')
 print('\\begin{tabular}{l' + ('r'*len(methods)) + '}')
-print('& ' + ' & '.join(map(escape, args.headers if args.headers else methods)) + '\\\\\\hline')
+headers = args.headers if args.headers else methods
+print('& ' + ' & '.join([r'\multicolumn{1}{c}{' + escape(h) + '}' for h in headers]) + '\\\\\\hline')
 
 for toclass in ('mode', 'mean'):#, 'median'):
     print('\\multicolumn{%d}{c}{\\textbf{%s}}\\\\' % (len(methods)+1, toclass.title()))
@@ -49,22 +51,25 @@ for toclass in ('mode', 'mean'):#, 'median'):
         best = getattr(np, 'nanarg' + order)(avgs) if order else -1
         for i, (avg, dev) in enumerate(zip(avgs, devs)):
             print('$', end='')
-            if i == best:
-                bold = True
-            elif i >= 0:
-                # compare this method against the best using a statistical test
+            bold = i == best
+            statistic_test = 0
+            if methods[i] != args.baseline:
+                # compare this method against the baseline using a statistical test
+                j = methods.index(args.baseline)
                 this_folds = scores_per_fold[i]
-                best_folds = scores_per_fold[best]
+                best_folds = scores_per_fold[j]
                 _, pvalue = stats.ttest_rel(this_folds, best_folds)
-                bold = pvalue/2 > 0.10  # divide by two to make it one-sided
-            else:
-                bold = False
+                statistic_test = (pvalue <= 0.2) * np.sign(np.mean(scores_per_fold[i]) - np.mean(scores_per_fold[j])) * (2*(order == 'max')-1)
+                if np.isnan(statistic_test):
+                    statistic_test = 0
             if bold:
                 print(r'\mathbf{', end='')
             print(f'{avg*magnitude:.{places}f} \pm {dev*magnitude:.{places}f}', end='')
             if bold:
                 print('}', end='')
             print('$', end='')
+            symbols = {0: r'\hphantom{$\circ$}', 1: r'$\circ$', -1: r'$\bullet$'}
+            print(f' {symbols[statistic_test]}', end='')
             if i < len(avgs)-1:
                 print(' & ', end='')
         print(' \\\\')
