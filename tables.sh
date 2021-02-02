@@ -1,5 +1,5 @@
 KS="4 7"
-METRICS="mae acc wilson tau"
+METRICS="wilson mae acc tau roc_auc"
 ARCHITECTURES="alexnet googlenet mobilenet_v2 resnet18 resnext50_32x4d shufflenet_v2_x1_0 squeezenet1_0 vgg16 wide_resnet50_2"
 METHODS="Base UnimodalCE Beckham OrdinalEncoder CO CO2 HO2"
 TOCLASSES="mode mode     mean    mode         mode mode mode"
@@ -9,7 +9,7 @@ echo "Results tables..."
 for METRIC in $METRICS; do
     for K in $KS; do
         echo $METRIC $K
-        python3 evaluate.py $METRIC $K Base mode outputs-k$K/* \
+        python3 evaluate.py $METRIC $K mode outputs-k$K/* \
             --architectures $ARCHITECTURES \
             --methods $METHODS \
             --toclasses $TOCLASSES \
@@ -24,7 +24,7 @@ METRICS="wilson mae acc tau roc_auc gini"
 HEADERS="CE BU PU OE CO CO2 HO2"
 for K in $KS; do
     echo $K
-    python3 evaluate_toclass.py $K Base outputs-k$K/* \
+    python3 evaluate_toclass.py $K outputs-k$K/* \
         --metrics $METRICS \
         --architectures $ARCHITECTURES \
         --methods $METHODS \

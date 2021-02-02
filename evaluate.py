@@ -2,7 +2,6 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('metric')
 parser.add_argument('K', type=int)
-parser.add_argument('baseline')
 parser.add_argument('outputs', nargs='+')
 parser.add_argument('--architectures', nargs='+')
 parser.add_argument('--methods', nargs='+')
@@ -33,8 +32,7 @@ fields = {k: v for k, v in zip(fields[::2], fields[1::2])}
 print(r'''\documentclass{standalone}
 \begin{document}''')
 print('\\begin{tabular}{l' + ('r'*len(methods)) + '}')
-headers = args.headers if args.headers else methods
-print('& ' + ' & '.join([r'\multicolumn{1}{c}{' + escape(h) + '}' for h in headers]) + '\\\\\\hline')
+print('& ' + ' & '.join(map(escape, args.headers if args.headers else methods)) + '\\\\\\hline')
 
 sum_avgs = []
 winners = [0] * len(methods)
@@ -53,32 +51,30 @@ for architecture in architectures:
     best = getattr(np, 'nanarg' + order)(avgs)
     for i, (avg, dev) in enumerate(zip(avgs, devs)):
         print('$', end='')
-        bold = i == best
-        statistic_test = 0
-        if methods[i] != args.baseline:
-            # compare this method against the baseline using a statistical test
-            j = methods.index(args.baseline)
+        italic = bold = False
+        if i == best:
+            bold = True
+        else:
+            # compare this method against the best using a statistical test
             this_folds = scores_per_fold[i]
-            best_folds = scores_per_fold[j]
+            best_folds = scores_per_fold[best]
             _, pvalue = stats.ttest_rel(this_folds, best_folds)
-            statistic_test = (pvalue <= 0.2) * np.sign(np.mean(scores_per_fold[i]) - np.mean(scores_per_fold[j])) * (2*(order == 'max')-1)
-            if np.isnan(statistic_test):
-                statistic_test = 0
+            italic = pvalue/2 > 0.10  # divide by two to make it one-sided
         if bold:
             print(r'\mathbf{', end='')
+        if italic:
+            print(r'\mathit{', end='')
         print(f'{avg*magnitude:.{places}f} \pm {dev*magnitude:.{places}f}', end='')
-        if bold:
+        if bold or italic:
             print('}', end='')
         print('$', end='')
-        symbols = {0: r'\hphantom{$\circ$}', 1: r'$\circ$', -1: r'$\bullet$'}
-        print(f' {symbols[statistic_test]}', end='')
         if i < len(avgs)-1:
             print(' & ', end='')
         winners[i] += int(bold)
     print(' \\\\')
     sum_avgs.append(avgs)
 print('\\hline')
-print('\\textbf{Avg} & ' + ' & '.join([r'\multicolumn{1}{c}{' + f'{a*magnitude:.{places}f}' + '}' for a in np.mean(sum_avgs, 0)]) + '\\\\')
-print('\\textbf{Winners} & ' + ' & '.join(r'\multicolumn{1}{c}{' + str(w) + '}' for w in winners) + '\\\\')
+print('\\textbf{Avg} & ' + ' & '.join([f'{a*magnitude:.{places}f}' for a in np.mean(sum_avgs, 0)]) + '\\\\')
+print('\\textbf{Winners} & ' + ' & '.join(str(w) for w in winners) + '\\\\')
 print(r'''\end{tabular}
 \end{document}''')
