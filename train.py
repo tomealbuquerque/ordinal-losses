@@ -36,7 +36,7 @@ def test(val):
         Y = Y.to(device, torch.int64)
         Yhat = model(X)
         Khat = model.to_classes(model.to_proba(Yhat), 'mode')
-        val_avg_acc += (Y == Khat).float().mean() / len(ts)
+        val_avg_acc += (Y == Khat).float().mean() / len(val)
     return val_avg_acc
 
 def train(tr, val, epochs=args.epochs, verbose=True):
