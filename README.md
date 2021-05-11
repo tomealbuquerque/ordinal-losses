@@ -1,5 +1,7 @@
 # Ordinal Losses for Classification of Cervical Cancer Risk
 
+https://peerj.com/articles/cs-457/
+
 by Tomé Albuquerque, Ricardo Cruz, Jaime S. Cardoso
 
 ## Usage
