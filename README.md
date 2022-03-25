@@ -17,3 +17,23 @@ by Tomé Albuquerque, Ricardo Cruz, Jaime S. Cardoso
     and outputs probabilities.
   * **evaluate.py:** generate latex tables with results using the output
     probabilities.
+    
+## Citation
+If you find this work useful for your research, please cite our paper:
+```
+@article{albuquerque2021ordinal,
+ title = {Ordinal losses for classification of cervical cancer risk},
+ author = {Albuquerque, Tomé and Cruz, Ricardo and Cardoso, Jaime S.},
+ year = 2021,
+ month = 4,
+ keywords = {Cervical cytology, Convolutional Neural networks, Deep learning, Ordinal classification, Pap smear},
+ volume = 7,
+ pages = {e457},
+ journal = {PeerJ Computer Science},
+ issn = {2376-5992},
+ url = {https://doi.org/10.7717/peerj-cs.457},
+ doi = {10.7717/peerj-cs.457}
+}
+```
+
+If you have any questions about our work, please do not hesitate to contact tome.albuquerque@gmail.com
